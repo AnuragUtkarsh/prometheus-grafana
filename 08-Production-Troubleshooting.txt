@@ -1,0 +1,760 @@
+===============================================================================
+                  08 - PRODUCTION TROUBLESHOOTING
+===============================================================================
+
+Author      : Anurag
+Technology  : Prometheus + Grafana + Alertmanager
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+PRODUCTION TROUBLESHOOTING FLOW
+===============================================================================
+
+Problem
+
+↓
+
+Identify Component
+
+↓
+
+Collect Logs
+
+↓
+
+Verify Configuration
+
+↓
+
+Restart Service
+
+↓
+
+Validate
+
+↓
+
+Monitor
+
+===============================================================================
+SCENARIO 1
+PROMETHEUS WEB UI NOT OPENING
+===============================================================================
+
+Check Service
+
+systemctl status prometheus
+
+--------------------------------
+
+Check Port
+
+ss -lntp | grep 9090
+
+--------------------------------
+
+Check Logs
+
+journalctl -u prometheus -f
+
+--------------------------------
+
+Check Config
+
+promtool check config /etc/prometheus/prometheus.yml
+
+===============================================================================
+SCENARIO 2
+NODE EXPORTER TARGET DOWN
+===============================================================================
+
+Check Service
+
+systemctl status node_exporter
+
+--------------------------------
+
+Check Port
+
+ss -lntp | grep 9100
+
+--------------------------------
+
+Browser
+
+http://server:9100/metrics
+
+--------------------------------
+
+Check Firewall
+
+ufw status
+
+--------------------------------
+
+Ping Server
+
+ping server_ip
+
+===============================================================================
+SCENARIO 3
+PROMETHEUS TARGET DOWN
+===============================================================================
+
+Browser
+
+http://server:9090/targets
+
+Possible Reasons
+
+Node Exporter Down
+
+Wrong IP
+
+Wrong Port
+
+Firewall
+
+Network Issue
+
+===============================================================================
+SCENARIO 4
+GRAFANA SHOWING NO DATA
+===============================================================================
+
+Check
+
+Grafana Running
+
+↓
+
+Datasource
+
+↓
+
+Prometheus Running
+
+↓
+
+Prometheus Targets
+
+↓
+
+Dashboard Variables
+
+===============================================================================
+SCENARIO 5
+DATASOURCE FAILED
+===============================================================================
+
+Check
+
+systemctl status prometheus
+
+--------------------------------
+
+Browser
+
+http://localhost:9090
+
+--------------------------------
+
+Grafana
+
+Save & Test
+
+===============================================================================
+SCENARIO 6
+ALERT NOT FIRING
+===============================================================================
+
+Check Rule
+
+↓
+
+PromQL Expression
+
+↓
+
+Threshold
+
+↓
+
+for Time
+
+↓
+
+Prometheus Restart
+
+↓
+
+Rules Page
+
+↓
+
+Alerts Page
+
+===============================================================================
+SCENARIO 7
+ALERTMANAGER EMPTY
+===============================================================================
+
+Check
+
+Prometheus Alert
+
+↓
+
+Pending ?
+
+↓
+
+Firing ?
+
+↓
+
+Alertmanager Integration
+
+↓
+
+Receiver
+
+===============================================================================
+SCENARIO 8
+EMAIL NOT RECEIVED
+===============================================================================
+
+Check
+
+Alertmanager Running
+
+↓
+
+SMTP Configuration
+
+↓
+
+App Password
+
+↓
+
+DNS
+
+↓
+
+Firewall
+
+↓
+
+SMTP Port 587
+
+===============================================================================
+SCENARIO 9
+DNS ERROR
+===============================================================================
+
+Example
+
+lookup smtp.gmail.com
+
+Reason
+
+DNS Missing
+
+Commands
+
+cat /etc/resolv.conf
+
+nslookup smtp.gmail.com
+
+ping smtp.gmail.com
+
+===============================================================================
+SCENARIO 10
+SMTP AUTHENTICATION FAILED
+===============================================================================
+
+Reason
+
+Wrong Password
+
+Normal Gmail Password
+
+Solution
+
+Use Gmail App Password
+
+===============================================================================
+SCENARIO 11
+CONFIGURATION ERROR
+===============================================================================
+
+Check
+
+promtool check config
+
+Expected
+
+SUCCESS
+
+--------------------------------
+
+Alertmanager
+
+amtool check-config
+
+===============================================================================
+SCENARIO 12
+PROMETHEUS SERVICE FAILED
+===============================================================================
+
+Logs
+
+journalctl -u prometheus -xe
+
+--------------------------------
+
+Validate
+
+promtool check config
+
+--------------------------------
+
+Restart
+
+systemctl restart prometheus
+
+===============================================================================
+SCENARIO 13
+NODE EXPORTER SERVICE FAILED
+===============================================================================
+
+Logs
+
+journalctl -u node_exporter -xe
+
+--------------------------------
+
+Verify
+
+node_exporter --version
+
+--------------------------------
+
+Check Service File
+
+/etc/systemd/system/node_exporter.service
+
+===============================================================================
+SCENARIO 14
+ALERTMANAGER SERVICE FAILED
+===============================================================================
+
+Logs
+
+journalctl -u alertmanager -xe
+
+--------------------------------
+
+Validate
+
+amtool check-config
+
+--------------------------------
+
+Restart
+
+systemctl restart alertmanager
+
+===============================================================================
+SCENARIO 15
+GRAFANA SERVICE FAILED
+===============================================================================
+
+systemctl status grafana-server
+
+--------------------------------
+
+journalctl -u grafana-server -xe
+
+--------------------------------
+
+Port
+
+ss -lntp | grep 3000
+
+===============================================================================
+IMPORTANT COMMANDS
+===============================================================================
+
+Prometheus
+
+systemctl status prometheus
+
+--------------------------------
+
+Node Exporter
+
+systemctl status node_exporter
+
+--------------------------------
+
+Grafana
+
+systemctl status grafana-server
+
+--------------------------------
+
+Alertmanager
+
+systemctl status alertmanager
+
+===============================================================================
+LOG LOCATIONS
+===============================================================================
+
+Prometheus
+
+journalctl -u prometheus -f
+
+--------------------------------
+
+Node Exporter
+
+journalctl -u node_exporter -f
+
+--------------------------------
+
+Grafana
+
+journalctl -u grafana-server -f
+
+--------------------------------
+
+Alertmanager
+
+journalctl -u alertmanager -f
+
+===============================================================================
+PORTS
+===============================================================================
+
+9090
+
+Prometheus
+
+--------------------------------
+
+9100
+
+Node Exporter
+
+--------------------------------
+
+9093
+
+Alertmanager
+
+--------------------------------
+
+3000
+
+Grafana
+
+===============================================================================
+CONFIGURATION FILES
+===============================================================================
+
+Prometheus
+
+/etc/prometheus/prometheus.yml
+
+--------------------------------
+
+Alert Rules
+
+/etc/prometheus/rules/
+
+--------------------------------
+
+Alertmanager
+
+/etc/alertmanager/alertmanager.yml
+
+--------------------------------
+
+Grafana
+
+/etc/grafana/grafana.ini
+
+===============================================================================
+VALIDATION COMMANDS
+===============================================================================
+
+Prometheus
+
+promtool check config /etc/prometheus/prometheus.yml
+
+--------------------------------
+
+Alertmanager
+
+amtool check-config /etc/alertmanager/alertmanager.yml
+
+===============================================================================
+PRODUCTION TROUBLESHOOTING SEQUENCE
+===============================================================================
+
+Problem
+
+↓
+
+Service Running?
+
+↓
+
+Port Listening?
+
+↓
+
+Logs
+
+↓
+
+Configuration
+
+↓
+
+Validation
+
+↓
+
+Restart
+
+↓
+
+Verify
+
+===============================================================================
+REAL INTERVIEW SCENARIOS
+===============================================================================
+
+Scenario
+
+Dashboard Blank
+
+Check
+
+Prometheus
+
+Datasource
+
+Targets
+
+------------------------------------------------
+
+Scenario
+
+Target Down
+
+Check
+
+Node Exporter
+
+Firewall
+
+Port
+
+------------------------------------------------
+
+Scenario
+
+CPU Alert Not Coming
+
+Check
+
+PromQL
+
+Threshold
+
+for
+
+------------------------------------------------
+
+Scenario
+
+Alertmanager Empty
+
+Check
+
+Alert State
+
+Pending
+
+Firing
+
+------------------------------------------------
+
+Scenario
+
+Email Failed
+
+Check
+
+SMTP
+
+DNS
+
+App Password
+
+Port 587
+
+===============================================================================
+INTERVIEW QUESTIONS
+===============================================================================
+
+Q1
+
+Dashboard Blank
+
+First Check?
+
+Grafana Datasource
+
+------------------------------------------------
+
+Q2
+
+Target DOWN
+
+First Check?
+
+Node Exporter Service
+
+------------------------------------------------
+
+Q3
+
+Prometheus Config Validation?
+
+promtool check config
+
+------------------------------------------------
+
+Q4
+
+Alertmanager Config Validation?
+
+amtool check-config
+
+------------------------------------------------
+
+Q5
+
+Logs Command?
+
+journalctl -u service_name -f
+
+------------------------------------------------
+
+Q6
+
+Prometheus Target Page?
+
+http://server:9090/targets
+
+------------------------------------------------
+
+Q7
+
+Rules Page?
+
+http://server:9090/rules
+
+------------------------------------------------
+
+Q8
+
+Alerts Page?
+
+http://server:9090/alerts
+
+------------------------------------------------
+
+Q9
+
+Alertmanager UI?
+
+http://server:9093
+
+------------------------------------------------
+
+Q10
+
+Grafana Port?
+
+3000
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Problem
+
+↓
+
+Service
+
+↓
+
+Port
+
+↓
+
+Logs
+
+↓
+
+Config
+
+↓
+
+Validation
+
+↓
+
+Restart
+
+↓
+
+Verify
+
+Remember
+
+promtool
+
+=
+
+Prometheus Validation
+
+amtool
+
+=
+
+Alertmanager Validation
+
+journalctl
+
+=
+
+Logs
+
+systemctl
+
+=
+
+Service
+
+===============================================================================
+END OF FILE
+===============================================================================
