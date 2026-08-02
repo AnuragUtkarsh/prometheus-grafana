@@ -1,0 +1,568 @@
+===============================================================================
+                    02 - PROMETHEUS INSTALLATION
+===============================================================================
+
+Author      : Anurag
+Technology  : Prometheus
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+LAB SETUP
+===============================================================================
+
+Prometheus Server
+
+Hostname
+
+prometheus
+
+IP Address
+
+192.168.198.171
+
+OS
+
+Ubuntu Server 24.04
+
+===============================================================================
+INSTALLATION METHOD
+===============================================================================
+
+Prometheus Installation can be done using
+
+1. APT Repository
+
+2. Binary Installation (Production Recommended)
+
+We used Binary Installation.
+
+===============================================================================
+STEP 1 : CREATE USER
+===============================================================================
+
+sudo useradd --no-create-home \
+--shell /usr/sbin/nologin prometheus
+
+Purpose
+
+Dedicated Service Account
+
+No Login
+
+More Secure
+
+===============================================================================
+STEP 2 : CREATE DIRECTORIES
+===============================================================================
+
+sudo mkdir /etc/prometheus
+
+sudo mkdir /var/lib/prometheus
+
+Purpose
+
+/etc/prometheus
+
+Configuration Files
+
+--------------------------------
+
+/var/lib/prometheus
+
+Stores Time Series Database
+
+===============================================================================
+STEP 3 : DOWNLOAD
+===============================================================================
+
+cd /tmp
+
+wget https://github.com/prometheus/prometheus/releases/download/v3.11.3/prometheus-3.11.3.linux-amd64.tar.gz
+
+===============================================================================
+STEP 4 : EXTRACT
+===============================================================================
+
+tar -xzf prometheus-3.11.3.linux-amd64.tar.gz
+
+cd prometheus-3.11.3.linux-amd64
+
+===============================================================================
+STEP 5 : VERIFY FILES
+===============================================================================
+
+ls
+
+Expected
+
+LICENSE
+
+NOTICE
+
+prometheus
+
+promtool
+
+prometheus.yml
+
+===============================================================================
+STEP 6 : COPY BINARIES
+===============================================================================
+
+sudo cp prometheus /usr/local/bin/
+
+sudo cp promtool /usr/local/bin/
+
+Verify
+
+prometheus --version
+
+promtool --version
+
+===============================================================================
+STEP 7 : COPY CONFIGURATION
+===============================================================================
+
+sudo cp prometheus.yml /etc/prometheus/
+
+===============================================================================
+STEP 8 : CHANGE OWNERSHIP
+===============================================================================
+
+sudo chown -R prometheus:prometheus /etc/prometheus
+
+sudo chown -R prometheus:prometheus /var/lib/prometheus
+
+sudo chown prometheus:prometheus /usr/local/bin/prometheus
+
+sudo chown prometheus:prometheus /usr/local/bin/promtool
+
+===============================================================================
+STEP 9 : CREATE SYSTEMD SERVICE
+===============================================================================
+
+File
+
+/etc/systemd/system/prometheus.service
+
+Contents
+
+[Unit]
+
+Description=Prometheus
+
+Documentation=https://prometheus.io/docs/
+
+After=network-online.target
+
+[Service]
+
+User=prometheus
+
+Group=prometheus
+
+Type=simple
+
+ExecStart=/usr/local/bin/prometheus \
+--config.file=/etc/prometheus/prometheus.yml \
+--storage.tsdb.path=/var/lib/prometheus
+
+Restart=on-failure
+
+[Install]
+
+WantedBy=multi-user.target
+
+===============================================================================
+STEP 10 : START SERVICE
+===============================================================================
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable prometheus
+
+sudo systemctl start prometheus
+
+===============================================================================
+STEP 11 : VERIFY
+===============================================================================
+
+systemctl status prometheus
+
+ss -lntp | grep 9090
+
+Expected
+
+LISTEN
+
+9090
+
+===============================================================================
+STEP 12 : ACCESS WEB UI
+===============================================================================
+
+http://192.168.198.171:9090
+
+===============================================================================
+PROMETHEUS DIRECTORY STRUCTURE
+===============================================================================
+
+/etc/prometheus/
+
+|
+
+|-- prometheus.yml
+
+|-- rules/
+
+|-- consoles/
+
+|-- console_libraries/
+
+|
+
+/var/lib/prometheus/
+
+|
+
+|-- TSDB
+
+===============================================================================
+PROMETHEUS CONFIGURATION
+===============================================================================
+
+Main File
+
+/etc/prometheus/prometheus.yml
+
+Contains
+
+Global
+
+Scrape Interval
+
+Targets
+
+Alert Rules
+
+===============================================================================
+GLOBAL SECTION
+===============================================================================
+
+global:
+
+scrape_interval: 15s
+
+evaluation_interval: 15s
+
+Meaning
+
+Every
+
+15 Seconds
+
+↓
+
+Collect Metrics
+
+===============================================================================
+SCRAPE CONFIG
+===============================================================================
+
+scrape_configs:
+
+Job Name
+
+Target
+
+Labels
+
+===============================================================================
+EXAMPLE
+===============================================================================
+
+scrape_configs:
+
+- job_name: "prometheus"
+
+static_configs:
+
+- targets:
+
+- localhost:9090
+
+===============================================================================
+COMMON COMMANDS
+===============================================================================
+
+Version
+
+prometheus --version
+
+--------------------------------
+
+Check Config
+
+promtool check config /etc/prometheus/prometheus.yml
+
+--------------------------------
+
+Restart
+
+systemctl restart prometheus
+
+--------------------------------
+
+Status
+
+systemctl status prometheus
+
+--------------------------------
+
+Logs
+
+journalctl -u prometheus -f
+
+--------------------------------
+
+Listening Port
+
+ss -lntp | grep 9090
+
+===============================================================================
+PROMTOOL
+===============================================================================
+
+Purpose
+
+Validate Configuration
+
+Syntax
+
+promtool check config /etc/prometheus/prometheus.yml
+
+Expected
+
+SUCCESS
+
+===============================================================================
+SYSTEMD COMMANDS
+===============================================================================
+
+Enable
+
+systemctl enable prometheus
+
+--------------------------------
+
+Start
+
+systemctl start prometheus
+
+--------------------------------
+
+Restart
+
+systemctl restart prometheus
+
+--------------------------------
+
+Stop
+
+systemctl stop prometheus
+
+--------------------------------
+
+Status
+
+systemctl status prometheus
+
+===============================================================================
+PRODUCTION BEST PRACTICES
+===============================================================================
+
+Run as Dedicated User
+
+Never Run as Root
+
+Store TSDB Separately
+
+Backup Configuration
+
+Validate Config Before Restart
+
+Use Systemd
+
+Enable Service on Boot
+
+===============================================================================
+COMMON ERRORS
+===============================================================================
+
+Error
+
+Port Already Used
+
+Solution
+
+ss -lntp | grep 9090
+
+--------------------------------
+
+Error
+
+Invalid YAML
+
+Solution
+
+promtool check config
+
+--------------------------------
+
+Error
+
+Permission Denied
+
+Solution
+
+chown prometheus:prometheus
+
+--------------------------------
+
+Error
+
+Service Failed
+
+Solution
+
+journalctl -u prometheus -xe
+
+===============================================================================
+INTERVIEW QUESTIONS
+===============================================================================
+
+Q1
+
+Why Binary Installation?
+
+Latest Version
+
+More Control
+
+Production Preferred
+
+--------------------------------
+
+Q2
+
+Why Create prometheus User?
+
+Security
+
+Least Privilege
+
+--------------------------------
+
+Q3
+
+Where is Configuration Stored?
+
+/etc/prometheus
+
+--------------------------------
+
+Q4
+
+Where is TSDB Stored?
+
+/var/lib/prometheus
+
+--------------------------------
+
+Q5
+
+Which Command Validates Config?
+
+promtool check config
+
+--------------------------------
+
+Q6
+
+Which Port?
+
+9090
+
+--------------------------------
+
+Q7
+
+Systemd Service File?
+
+/etc/systemd/system/prometheus.service
+
+--------------------------------
+
+Q8
+
+How to Check Logs?
+
+journalctl -u prometheus -f
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Create User
+
+↓
+
+Create Directories
+
+↓
+
+Download Binary
+
+↓
+
+Extract
+
+↓
+
+Copy Binaries
+
+↓
+
+Copy prometheus.yml
+
+↓
+
+Change Ownership
+
+↓
+
+Create Systemd Service
+
+↓
+
+Enable
+
+↓
+
+Start
+
+↓
+
+9090
+
+↓
+
+Verify
+
+↓
+
+Promtool Check
+
+===============================================================================
+END OF FILE
+===============================================================================
