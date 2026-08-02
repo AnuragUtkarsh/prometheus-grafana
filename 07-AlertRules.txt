@@ -1,0 +1,733 @@
+===============================================================================
+                           07 - ALERT RULES
+===============================================================================
+
+Author      : Anurag
+Technology  : Prometheus Alert Rules
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+WHAT IS ALERT RULE?
+===============================================================================
+
+Alert Rule is a condition evaluated by Prometheus.
+
+If condition becomes TRUE
+
+↓
+
+Alert becomes
+
+Pending
+
+↓
+
+After specified time
+
+↓
+
+Firing
+
+↓
+
+Sent to Alertmanager
+
+===============================================================================
+FLOW
+===============================================================================
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+PromQL Expression
+
+↓
+
+Condition TRUE
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+Email
+
+===============================================================================
+RULE FILE LOCATION
+===============================================================================
+
+/etc/prometheus/rules/
+
+Example
+
+node-alerts.yml
+
+===============================================================================
+PROMETHEUS CONFIGURATION
+===============================================================================
+
+File
+
+/etc/prometheus/prometheus.yml
+
+Add
+
+rule_files:
+
+- "/etc/prometheus/rules/*.yml"
+
+Validate
+
+promtool check config /etc/prometheus/prometheus.yml
+
+Restart
+
+systemctl restart prometheus
+
+===============================================================================
+RULE STRUCTURE
+===============================================================================
+
+groups:
+
+- name: linux_alerts
+
+  rules:
+
+  - alert: HighCPUUsage
+
+    expr:
+
+    for:
+
+    labels:
+
+    annotations:
+
+===============================================================================
+FIELDS
+===============================================================================
+
+groups
+
+Collection of rules
+
+--------------------------------
+
+name
+
+Rule Group Name
+
+--------------------------------
+
+rules
+
+List of Rules
+
+--------------------------------
+
+alert
+
+Alert Name
+
+--------------------------------
+
+expr
+
+PromQL Expression
+
+--------------------------------
+
+for
+
+Condition should remain true for this duration
+
+--------------------------------
+
+labels
+
+Metadata
+
+Example
+
+warning
+
+critical
+
+info
+
+--------------------------------
+
+annotations
+
+Human Readable Message
+
+===============================================================================
+CPU ALERT
+===============================================================================
+
+groups:
+
+- name: linux_alerts
+
+  rules:
+
+  - alert: HighCPUUsage
+
+    expr:
+
+      100 -
+
+      (
+
+      avg by(instance)
+
+      (
+
+      rate(node_cpu_seconds_total{mode="idle"}[5m])
+
+      )
+
+      *100
+
+      )
+
+      > 80
+
+    for: 2m
+
+    labels:
+
+      severity: warning
+
+    annotations:
+
+      summary: High CPU Usage
+
+      description: CPU Usage above 80%
+
+===============================================================================
+MEMORY ALERT
+===============================================================================
+
+- alert: HighMemoryUsage
+
+  expr:
+
+  (
+
+  1 -
+
+  (
+
+  node_memory_MemAvailable_bytes
+
+  /
+
+  node_memory_MemTotal_bytes
+
+  )
+
+  )
+
+  *100
+
+  > 90
+
+  for: 2m
+
+===============================================================================
+DISK ALERT
+===============================================================================
+
+- alert: DiskUsageHigh
+
+  expr:
+
+  100 -
+
+  (
+
+  node_filesystem_avail_bytes
+
+  /
+
+  node_filesystem_size_bytes
+
+  *100
+
+  )
+
+  > 85
+
+  for: 5m
+
+===============================================================================
+NODE DOWN ALERT
+===============================================================================
+
+- alert: NodeDown
+
+  expr:
+
+  up==0
+
+  for: 1m
+
+===============================================================================
+LOAD ALERT
+===============================================================================
+
+- alert: HighLoad
+
+  expr:
+
+  node_load1>5
+
+  for: 2m
+
+===============================================================================
+PENDING STATE
+===============================================================================
+
+Condition TRUE
+
+↓
+
+Timer Starts
+
+↓
+
+Still TRUE
+
+↓
+
+Pending
+
+===============================================================================
+FIRING STATE
+===============================================================================
+
+Pending Time Complete
+
+↓
+
+Alert becomes FIRING
+
+↓
+
+Sent to Alertmanager
+
+===============================================================================
+LABELS
+===============================================================================
+
+severity
+
+warning
+
+--------------------------------
+
+severity
+
+critical
+
+--------------------------------
+
+team
+
+linux
+
+--------------------------------
+
+environment
+
+production
+
+===============================================================================
+ANNOTATIONS
+===============================================================================
+
+summary
+
+Short Message
+
+--------------------------------
+
+description
+
+Detailed Message
+
+===============================================================================
+TEST CPU ALERT
+===============================================================================
+
+stress-ng --cpu 2 --timeout 300s
+
+OR
+
+yes > /dev/null &
+
+===============================================================================
+VERIFY ALERT
+===============================================================================
+
+Browser
+
+http://server:9090/alerts
+
+Status
+
+Inactive
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+===============================================================================
+VERIFY ALERTMANAGER
+===============================================================================
+
+Browser
+
+http://server:9093
+
+Alert should appear.
+
+===============================================================================
+COMMON COMMANDS
+===============================================================================
+
+Validate Config
+
+promtool check config /etc/prometheus/prometheus.yml
+
+--------------------------------
+
+Restart
+
+systemctl restart prometheus
+
+--------------------------------
+
+Rules
+
+http://server:9090/rules
+
+--------------------------------
+
+Alerts
+
+http://server:9090/alerts
+
+===============================================================================
+COMMON ERRORS
+===============================================================================
+
+Rule Not Loaded
+
+Wrong YAML
+
+--------------------------------
+
+Pending Forever
+
+CPU dropped below threshold
+
+--------------------------------
+
+No Alert
+
+Prometheus not restarted
+
+--------------------------------
+
+No Email
+
+Alertmanager
+
+SMTP
+
+DNS
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+Rule Created
+
+↓
+
+Promtool Check
+
+↓
+
+Restart Prometheus
+
+↓
+
+Rules Page
+
+↓
+
+Alerts Page
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+Email
+
+===============================================================================
+BEST PRACTICES
+===============================================================================
+
+Always Validate Config
+
+Use Proper Labels
+
+Use Proper Severity
+
+Avoid Short for Values
+
+Group Similar Rules
+
+Use Meaningful Alert Names
+
+===============================================================================
+INTERVIEW QUESTIONS
+===============================================================================
+
+Q1
+
+What is Alert Rule?
+
+Condition evaluated by Prometheus.
+
+------------------------------------------------
+
+Q2
+
+Who evaluates Alert Rules?
+
+Prometheus
+
+------------------------------------------------
+
+Q3
+
+Who sends Email?
+
+Alertmanager
+
+------------------------------------------------
+
+Q4
+
+Meaning of for:2m ?
+
+Condition should remain TRUE for 2 Minutes.
+
+------------------------------------------------
+
+Q5
+
+Difference between Pending and Firing?
+
+Pending
+
+Waiting
+
+Firing
+
+Notification Sent
+
+------------------------------------------------
+
+Q6
+
+Where are Alert Rules stored?
+
+/etc/prometheus/rules/
+
+------------------------------------------------
+
+Q7
+
+How to validate Alert Rule?
+
+promtool check config
+
+------------------------------------------------
+
+Q8
+
+Most Common Production Alerts?
+
+CPU
+
+Memory
+
+Disk
+
+Node Down
+
+Filesystem
+
+Service Down
+
+------------------------------------------------
+
+Q9
+
+How to test CPU Alert?
+
+stress-ng
+
+or
+
+yes > /dev/null
+
+------------------------------------------------
+
+Q10
+
+Where to see Alerts?
+
+Prometheus
+
+/alerts
+
+Alertmanager
+
+9093
+
+===============================================================================
+PRODUCTION ALERT FLOW
+===============================================================================
+
+CPU > 80%
+
+↓
+
+Prometheus Rule
+
+↓
+
+Pending
+
+↓
+
+2 Minutes
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+SMTP
+
+↓
+
+Linux Team
+
+↓
+
+Issue Fixed
+
+↓
+
+Resolved Notification
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Alert Rule
+
+↓
+
+PromQL
+
+↓
+
+Condition TRUE
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+Email
+
+Remember
+
+expr
+
+=
+
+Condition
+
+for
+
+=
+
+Waiting Time
+
+labels
+
+=
+
+Metadata
+
+annotations
+
+=
+
+Human Message
+
+===============================================================================
+END OF FILE
+===============================================================================
