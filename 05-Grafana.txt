@@ -1,0 +1,727 @@
+===============================================================================
+                             05 - GRAFANA
+===============================================================================
+
+Author      : Anurag
+Technology  : Grafana
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+WHAT IS GRAFANA?
+===============================================================================
+
+Grafana is an Open Source Visualization Tool.
+
+Purpose
+
+- Dashboards
+- Charts
+- Graphs
+- Monitoring
+- Alerting
+- Reports
+
+Grafana DOES NOT store metrics.
+
+Grafana reads metrics from Datasources like
+
+- Prometheus
+- Elasticsearch
+- Loki
+- InfluxDB
+- MySQL
+- PostgreSQL
+
+===============================================================================
+ARCHITECTURE
+===============================================================================
+
+Linux Server
+
+↓
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+↓
+
+Dashboard
+
+===============================================================================
+DEFAULT PORT
+===============================================================================
+
+3000
+
+===============================================================================
+LAB SETUP
+===============================================================================
+
+Grafana Server
+
+Hostname
+
+prometheus
+
+IP
+
+192.168.198.171
+
+Port
+
+3000
+
+===============================================================================
+INSTALLATION
+===============================================================================
+
+Install
+
+sudo apt install grafana -y
+
+Enable
+
+systemctl enable grafana-server
+
+Start
+
+systemctl start grafana-server
+
+Status
+
+systemctl status grafana-server
+
+===============================================================================
+VERIFY
+===============================================================================
+
+Browser
+
+http://192.168.198.171:3000
+
+Default Username
+
+admin
+
+Default Password
+
+admin
+
+Change Password
+
+Recommended
+
+===============================================================================
+SYSTEMD COMMANDS
+===============================================================================
+
+Start
+
+systemctl start grafana-server
+
+--------------------------------
+
+Stop
+
+systemctl stop grafana-server
+
+--------------------------------
+
+Restart
+
+systemctl restart grafana-server
+
+--------------------------------
+
+Status
+
+systemctl status grafana-server
+
+--------------------------------
+
+Logs
+
+journalctl -u grafana-server -f
+
+===============================================================================
+MAIN CONFIGURATION FILE
+===============================================================================
+
+/etc/grafana/grafana.ini
+
+===============================================================================
+ADD DATASOURCE
+===============================================================================
+
+Dashboard
+
+↓
+
+Connections
+
+↓
+
+Data Sources
+
+↓
+
+Add Data Source
+
+↓
+
+Prometheus
+
+URL
+
+http://localhost:9090
+
+Save & Test
+
+Expected
+
+Datasource is Working
+
+===============================================================================
+IMPORT DASHBOARD
+===============================================================================
+
+Dashboard
+
+↓
+
+Import
+
+↓
+
+Dashboard ID
+
+1860
+
+Dashboard Name
+
+Node Exporter Full
+
+Datasource
+
+Prometheus
+
+Import
+
+===============================================================================
+NODE EXPORTER DASHBOARD
+===============================================================================
+
+Displays
+
+CPU Usage
+
+Memory Usage
+
+Filesystem Usage
+
+Load Average
+
+Disk IO
+
+Network
+
+Processes
+
+Uptime
+
+Temperature
+
+Swap
+
+===============================================================================
+IMPORTANT DASHBOARD IDS
+===============================================================================
+
+1860
+
+Node Exporter Full
+
+--------------------------------
+
+3662
+
+Prometheus 2.0
+
+--------------------------------
+
+6417
+
+Kubernetes Cluster
+
+--------------------------------
+
+315
+
+Kubernetes Monitoring
+
+===============================================================================
+IMPORTANT PANELS
+===============================================================================
+
+CPU
+
+Memory
+
+Filesystem
+
+Network
+
+Load
+
+Processes
+
+Disk IO
+
+Uptime
+
+===============================================================================
+REFRESH INTERVAL
+===============================================================================
+
+Top Right
+
+↓
+
+Refresh
+
+Example
+
+5 Seconds
+
+10 Seconds
+
+30 Seconds
+
+1 Minute
+
+===============================================================================
+TIME RANGE
+===============================================================================
+
+Last 5 Minutes
+
+Last 15 Minutes
+
+Last 1 Hour
+
+Last 24 Hours
+
+Last 7 Days
+
+===============================================================================
+VARIABLES
+===============================================================================
+
+Variables allow selecting
+
+Server
+
+Instance
+
+Job
+
+Cluster
+
+Example
+
+Node1
+
+↓
+
+Node2
+
+↓
+
+Node3
+
+Dashboard automatically changes.
+
+===============================================================================
+DASHBOARD FLOW
+===============================================================================
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+Grafana Query
+
+↓
+
+Panel
+
+↓
+
+Graph
+
+===============================================================================
+COMMON PANELS
+===============================================================================
+
+Stat
+
+Single Value
+
+--------------------------------
+
+Time Series
+
+Line Graph
+
+--------------------------------
+
+Gauge
+
+Percentage
+
+--------------------------------
+
+Bar Gauge
+
+Bars
+
+--------------------------------
+
+Table
+
+Tabular Output
+
+===============================================================================
+COMMON COMMANDS
+===============================================================================
+
+Listening Port
+
+ss -lntp | grep 3000
+
+--------------------------------
+
+Logs
+
+journalctl -u grafana-server -f
+
+--------------------------------
+
+Status
+
+systemctl status grafana-server
+
+===============================================================================
+COMMON ERRORS
+===============================================================================
+
+Problem
+
+Grafana Not Opening
+
+Check
+
+systemctl status grafana-server
+
+--------------------------------
+
+Problem
+
+Datasource Error
+
+Check
+
+Prometheus Running
+
+--------------------------------
+
+Problem
+
+No Data
+
+Check
+
+Prometheus Target UP
+
+--------------------------------
+
+Problem
+
+Dashboard Empty
+
+Datasource Selected?
+
+Target UP?
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+1
+
+Grafana Running?
+
+↓
+
+systemctl status grafana-server
+
+↓
+
+2
+
+Prometheus Running?
+
+↓
+
+systemctl status prometheus
+
+↓
+
+3
+
+Datasource Working?
+
+↓
+
+Save & Test
+
+↓
+
+4
+
+Targets UP?
+
+↓
+
+http://server:9090/targets
+
+↓
+
+5
+
+Dashboard Imported?
+
+↓
+
+Dashboard ID 1860
+
+===============================================================================
+PRODUCTION USE CASE
+===============================================================================
+
+Linux Server
+
+↓
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+↓
+
+Dashboard
+
+↓
+
+CPU 95%
+
+↓
+
+Alert
+
+↓
+
+Linux Team
+
+===============================================================================
+BEST PRACTICES
+===============================================================================
+
+Use Variables
+
+Auto Refresh
+
+Use Templates
+
+Use Folders
+
+Use Separate Dashboards
+
+Monitor Multiple Servers
+
+===============================================================================
+INTERVIEW QUESTIONS
+===============================================================================
+
+Q1
+
+What is Grafana?
+
+Visualization Tool.
+
+------------------------------------------------
+
+Q2
+
+Does Grafana Store Metrics?
+
+No.
+
+------------------------------------------------
+
+Q3
+
+Who Stores Metrics?
+
+Prometheus.
+
+------------------------------------------------
+
+Q4
+
+Default Port?
+
+3000
+
+------------------------------------------------
+
+Q5
+
+Datasource Used?
+
+Prometheus
+
+------------------------------------------------
+
+Q6
+
+Dashboard Import ID?
+
+1860
+
+------------------------------------------------
+
+Q7
+
+How to Verify Datasource?
+
+Save & Test
+
+------------------------------------------------
+
+Q8
+
+Can Grafana Read Elasticsearch?
+
+Yes
+
+------------------------------------------------
+
+Q9
+
+Difference Between Grafana and Prometheus?
+
+Prometheus
+
+Collects & Stores Metrics
+
+Grafana
+
+Visualizes Metrics
+
+------------------------------------------------
+
+Q10
+
+Main Config File?
+
+/etc/grafana/grafana.ini
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Grafana
+
+↓
+
+Visualization
+
+↓
+
+Datasource
+
+↓
+
+Prometheus
+
+↓
+
+Dashboard
+
+↓
+
+1860
+
+↓
+
+CPU
+
+↓
+
+Memory
+
+↓
+
+Filesystem
+
+↓
+
+Network
+
+↓
+
+Variables
+
+↓
+
+Auto Refresh
+
+↓
+
+3000
+
+Remember
+
+Grafana
+
+=
+
+Visualization Only
+
+Prometheus
+
+=
+
+Storage + Monitoring
+
+===============================================================================
+END OF FILE
+===============================================================================
