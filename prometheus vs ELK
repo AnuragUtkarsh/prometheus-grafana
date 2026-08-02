@@ -1,0 +1,18 @@
+ELK Stack logs ke liye use hota hai. Hum Filebeat ke through logs collect karte hain, Logstash unhe process karta hai, Elasticsearch me store hote hain aur Kibana se search aur analyze karte hain. 
+Agar kisi application me exception, SSH login failure ya service error aaye to ELK uska root cause analyze karne me help karta hai.
+
+Prometheus aur Grafana metrics monitoring ke liye use hote hain. Node Exporter CPU, Memory, Disk, Network jaise metrics expose karta hai. Prometheus un metrics ko scrape karke store karta hai,
+Grafana dashboards provide karta hai, aur Alertmanager threshold cross hone par email ya Slack notification bhej sakta hai.
+
+Example ke liye, agar server ka CPU 95% ho jata hai, to Prometheus turant alert generate karega. Uske baad main Kibana me jaakar dekhunga ki CPU spike kis application ya process ke logs ki wajah se hua.
+Is tarah Prometheus problem detect karta hai aur ELK root cause analysis me help karta hai.
+
+Isliye production environments me ELK aur Prometheus-Grafana dono saath me use kiye jaate hain. Ek metrics monitor karta hai aur doosra logs analyze karta hai."
+
+
+Prometheus + Grafana infrastructure metrics (CPU, Memory, Disk, Network) monitor karte hain, jabki ELK application aur system logs collect, search aur analyze karta hai. Production me complete observability
+ke liye dono saath use hote hain.
+
+Maine apne home lab me 3 Ubuntu VMs par Prometheus, Node Exporter, Grafana aur Alertmanager deploy kiya tha. Do Linux nodes monitor kiye, Grafana dashboard import kiya, CPU alert rule banaya, Alertmanager 
+integrate kiya aur high CPU condition ko successfully trigger karke alert flow verify kiya. Saath hi ELK Stack me Filebeat → Logstash → Elasticsearch → Kibana pipeline configure karke Linux logs centralize aur 
+visualize kiye.
