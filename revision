@@ -1,0 +1,437 @@
+===============================================================================
+                  10 - 5 MINUTE REVISION (CHEAT SHEET)
+===============================================================================
+
+
+
+STACK
+
+Linux Server
+
+↓
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+TSDB
+
+↓
+
+PromQL
+
+↓
+
+Alert Rules
+
+↓
+
+Alertmanager
+
+↓
+
+Email
+
+↓
+
+Grafana Dashboard
+
+===============================================================================
+WHO DOES WHAT?
+===============================================================================
+
+Node Exporter
+
+↓
+
+Collect Linux Metrics
+
+--------------------------------
+
+Prometheus
+
+↓
+
+Scrape Metrics
+
+↓
+
+Store Metrics
+
+↓
+
+Evaluate Alert Rules
+
+--------------------------------
+
+Alertmanager
+
+↓
+
+Receive Alerts
+
+↓
+
+Group Alerts
+
+↓
+
+Send Email
+
+--------------------------------
+
+Grafana
+
+↓
+
+Visualization
+
+↓
+
+Dashboards
+
+===============================================================================
+DEFAULT PORTS
+===============================================================================
+
+Prometheus
+
+9090
+
+--------------------------------
+
+Node Exporter
+
+9100
+
+--------------------------------
+
+Alertmanager
+
+9093
+
+--------------------------------
+
+Grafana
+
+3000
+
+===============================================================================
+CONFIG FILES
+===============================================================================
+
+Prometheus
+
+/etc/prometheus/prometheus.yml
+
+--------------------------------
+
+Rules
+
+/etc/prometheus/rules/
+
+--------------------------------
+
+Alertmanager
+
+/etc/alertmanager/alertmanager.yml
+
+--------------------------------
+
+Grafana
+
+/etc/grafana/grafana.ini
+
+===============================================================================
+IMPORTANT COMMANDS
+===============================================================================
+
+Status
+
+systemctl status prometheus
+
+systemctl status node_exporter
+
+systemctl status alertmanager
+
+systemctl status grafana-server
+
+--------------------------------
+
+Restart
+
+systemctl restart prometheus
+
+systemctl restart node_exporter
+
+systemctl restart alertmanager
+
+systemctl restart grafana-server
+
+--------------------------------
+
+Logs
+
+journalctl -u prometheus -f
+
+journalctl -u node_exporter -f
+
+journalctl -u alertmanager -f
+
+journalctl -u grafana-server -f
+
+--------------------------------
+
+Validate
+
+promtool check config /etc/prometheus/prometheus.yml
+
+amtool check-config /etc/alertmanager/alertmanager.yml
+
+===============================================================================
+IMPORTANT URLS
+===============================================================================
+
+Prometheus
+
+http://server:9090
+
+--------------------------------
+
+Targets
+
+http://server:9090/targets
+
+--------------------------------
+
+Rules
+
+http://server:9090/rules
+
+--------------------------------
+
+Alerts
+
+http://server:9090/alerts
+
+--------------------------------
+
+Alertmanager
+
+http://server:9093
+
+--------------------------------
+
+Grafana
+
+http://server:3000
+
+===============================================================================
+MOST IMPORTANT PROMQL
+===============================================================================
+
+up
+
+--------------------------------
+
+CPU %
+
+100-(avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m]))*100)
+
+--------------------------------
+
+Memory %
+
+(1-(node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes))*100
+
+--------------------------------
+
+Disk %
+
+100-(node_filesystem_avail_bytes/node_filesystem_size_bytes*100)
+
+===============================================================================
+ALERT FLOW
+===============================================================================
+
+Condition TRUE
+
+↓
+
+Pending
+
+↓
+
+for:2m
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+Email
+
+===============================================================================
+MOST ASKED INTERVIEW QUESTIONS
+===============================================================================
+
+Prometheus Port?
+
+9090
+
+--------------------------------
+
+Node Exporter Port?
+
+9100
+
+--------------------------------
+
+Grafana Port?
+
+3000
+
+--------------------------------
+
+Alertmanager Port?
+
+9093
+
+--------------------------------
+
+Prometheus Push or Pull?
+
+Pull
+
+--------------------------------
+
+Prometheus Stores?
+
+Metrics
+
+Timestamp
+
+Value
+
+--------------------------------
+
+Grafana Stores Metrics?
+
+No
+
+--------------------------------
+
+Who Sends Email?
+
+Alertmanager
+
+--------------------------------
+
+Who Evaluates Alert Rules?
+
+Prometheus
+
+--------------------------------
+
+Node Exporter Purpose?
+
+Expose Linux Metrics
+
+===============================================================================
+TROUBLESHOOTING FLOW
+===============================================================================
+
+Service
+
+↓
+
+Port
+
+↓
+
+Logs
+
+↓
+
+Configuration
+
+↓
+
+Validation
+
+↓
+
+Restart
+
+↓
+
+Verify
+
+===============================================================================
+PRODUCTION FLOW
+===============================================================================
+
+Linux
+
+↓
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+Alert Rules
+
+↓
+
+Alertmanager
+
+↓
+
+Email
+
+↓
+
+Linux Engineer
+
+===============================================================================
+ONE LINE DEFINITIONS
+===============================================================================
+
+Prometheus
+
+Monitoring Engine
+
+--------------------------------
+
+Node Exporter
+
+Linux Metrics Exporter
+
+--------------------------------
+
+Alertmanager
+
+Notification Engine
+
+--------------------------------
+
+Grafana
+
+Visualization Engine
+
+===============================================================================
+END
+===============================================================================
