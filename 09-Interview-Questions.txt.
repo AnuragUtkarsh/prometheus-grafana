@@ -1,0 +1,761 @@
+===============================================================================
+                     09 - PROMETHEUS INTERVIEW QUESTIONS
+===============================================================================
+
+Author      : Anurag
+Technology  : Prometheus + Grafana + Alertmanager
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+PROMETHEUS
+===============================================================================
+
+Q1. What is Prometheus?
+
+Answer
+
+Prometheus is an Open Source Monitoring and Alerting Tool developed by
+SoundCloud and maintained by CNCF.
+
+It collects metrics from servers, stores them in TSDB and evaluates alert rules.
+
+-------------------------------------------------------------------------------
+
+Q2. What is TSDB?
+
+Answer
+
+TSDB means Time Series Database.
+
+Stores
+
+Metric
+
++
+
+Timestamp
+
++
+
+Value
+
+-------------------------------------------------------------------------------
+
+Q3. What is PromQL?
+
+Answer
+
+PromQL is Prometheus Query Language used for querying metrics.
+
+-------------------------------------------------------------------------------
+
+Q4. Prometheus Push or Pull?
+
+Answer
+
+Pull.
+
+Prometheus itself scrapes metrics from exporters.
+
+-------------------------------------------------------------------------------
+
+Q5. Default Port?
+
+Answer
+
+9090
+
+-------------------------------------------------------------------------------
+
+Q6. Prometheus Configuration File?
+
+Answer
+
+/etc/prometheus/prometheus.yml
+
+-------------------------------------------------------------------------------
+
+Q7. How to validate configuration?
+
+Answer
+
+promtool check config /etc/prometheus/prometheus.yml
+
+-------------------------------------------------------------------------------
+
+Q8. How to restart Prometheus?
+
+Answer
+
+systemctl restart prometheus
+
+-------------------------------------------------------------------------------
+
+Q9. How to check logs?
+
+Answer
+
+journalctl -u prometheus -f
+
+-------------------------------------------------------------------------------
+
+Q10. Where can you check Targets?
+
+Answer
+
+http://server:9090/targets
+
+===============================================================================
+NODE EXPORTER
+===============================================================================
+
+Q11. What is Node Exporter?
+
+Answer
+
+Exporter used for collecting Linux System Metrics.
+
+-------------------------------------------------------------------------------
+
+Q12. Default Port?
+
+Answer
+
+9100
+
+-------------------------------------------------------------------------------
+
+Q13. Who collects metrics?
+
+Answer
+
+Node Exporter
+
+-------------------------------------------------------------------------------
+
+Q14. Who stores metrics?
+
+Answer
+
+Prometheus
+
+-------------------------------------------------------------------------------
+
+Q15. Which URL exposes metrics?
+
+Answer
+
+http://server:9100/metrics
+
+-------------------------------------------------------------------------------
+
+Q16. Does Node Exporter store metrics?
+
+Answer
+
+No.
+
+===============================================================================
+PROMQL
+===============================================================================
+
+Q17. How to check Target Status?
+
+Answer
+
+up
+
+-------------------------------------------------------------------------------
+
+Q18. CPU Usage Query?
+
+Answer
+
+100 -
+
+(
+
+avg by(instance)
+
+(
+
+rate(node_cpu_seconds_total{mode="idle"}[5m])
+
+)
+
+*100
+
+)
+
+-------------------------------------------------------------------------------
+
+Q19. Memory Usage Query?
+
+Answer
+
+(
+1 -
+(
+node_memory_MemAvailable_bytes
+/
+node_memory_MemTotal_bytes
+)
+)
+*100
+
+-------------------------------------------------------------------------------
+
+Q20. Disk Usage Query?
+
+Answer
+
+100 -
+
+(
+node_filesystem_avail_bytes
+/
+node_filesystem_size_bytes
+*100
+)
+
+-------------------------------------------------------------------------------
+
+Q21. Difference between rate() and irate()?
+
+Answer
+
+rate()
+
+Average Rate
+
+irate()
+
+Instant Rate
+
+-------------------------------------------------------------------------------
+
+Q22. Difference between Counter and Gauge?
+
+Answer
+
+Counter
+
+Only Increases
+
+Gauge
+
+Increase and Decrease
+
+===============================================================================
+GRAFANA
+===============================================================================
+
+Q23. What is Grafana?
+
+Answer
+
+Visualization Tool.
+
+-------------------------------------------------------------------------------
+
+Q24. Default Port?
+
+Answer
+
+3000
+
+-------------------------------------------------------------------------------
+
+Q25. Does Grafana store metrics?
+
+Answer
+
+No.
+
+-------------------------------------------------------------------------------
+
+Q26. Who stores metrics?
+
+Answer
+
+Prometheus
+
+-------------------------------------------------------------------------------
+
+Q27. Dashboard ID used for Linux Monitoring?
+
+Answer
+
+1860
+
+(Node Exporter Full)
+
+-------------------------------------------------------------------------------
+
+Q28. Grafana Configuration File?
+
+Answer
+
+/etc/grafana/grafana.ini
+
+===============================================================================
+ALERTMANAGER
+===============================================================================
+
+Q29. What is Alertmanager?
+
+Answer
+
+Notification Component of Prometheus.
+
+-------------------------------------------------------------------------------
+
+Q30. Default Port?
+
+Answer
+
+9093
+
+-------------------------------------------------------------------------------
+
+Q31. Who sends Email?
+
+Answer
+
+Alertmanager
+
+-------------------------------------------------------------------------------
+
+Q32. Does Alertmanager evaluate rules?
+
+Answer
+
+No.
+
+Prometheus evaluates rules.
+
+-------------------------------------------------------------------------------
+
+Q33. What is Receiver?
+
+Answer
+
+Destination of Alert.
+
+-------------------------------------------------------------------------------
+
+Q34. What is Route?
+
+Answer
+
+Defines which receiver should receive alerts.
+
+-------------------------------------------------------------------------------
+
+Q35. What is Silence?
+
+Answer
+
+Temporarily suppress alerts.
+
+-------------------------------------------------------------------------------
+
+Q36. What is Inhibition?
+
+Answer
+
+Suppress child alerts when parent alert already exists.
+
+===============================================================================
+ALERT RULES
+===============================================================================
+
+Q37. What is Alert Rule?
+
+Answer
+
+Condition evaluated by Prometheus.
+
+-------------------------------------------------------------------------------
+
+Q38. Difference between Pending and Firing?
+
+Answer
+
+Pending
+
+Waiting Period
+
+Firing
+
+Alert Sent to Alertmanager
+
+-------------------------------------------------------------------------------
+
+Q39. Meaning of for:2m ?
+
+Answer
+
+Condition should remain TRUE continuously for 2 Minutes.
+
+-------------------------------------------------------------------------------
+
+Q40. Rule Location?
+
+Answer
+
+/etc/prometheus/rules/
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+Q41. Dashboard shows No Data. What will you check?
+
+Answer
+
+1. Grafana Service
+
+2. Datasource
+
+3. Prometheus
+
+4. Targets
+
+-------------------------------------------------------------------------------
+
+Q42. Target DOWN. What will you check?
+
+Answer
+
+Node Exporter
+
+Firewall
+
+Network
+
+Port
+
+-------------------------------------------------------------------------------
+
+Q43. Alert not coming.
+
+Answer
+
+Rule
+
+PromQL
+
+Threshold
+
+for
+
+Prometheus Restart
+
+-------------------------------------------------------------------------------
+
+Q44. Email not received.
+
+Answer
+
+SMTP
+
+DNS
+
+App Password
+
+Alertmanager
+
+-------------------------------------------------------------------------------
+
+Q45. Prometheus service failed.
+
+Answer
+
+systemctl status prometheus
+
+journalctl -u prometheus -f
+
+promtool check config
+
+===============================================================================
+REAL INTERVIEW SCENARIOS
+===============================================================================
+
+Q46.
+
+CPU 95%
+
+Dashboard Showing High CPU
+
+No Email
+
+What will you check?
+
+Answer
+
+Alert Rule
+
+↓
+
+Pending/Firing
+
+↓
+
+Alertmanager
+
+↓
+
+SMTP
+
+↓
+
+DNS
+
+-------------------------------------------------------------------------------
+
+Q47.
+
+Target DOWN
+
+What will you check?
+
+Answer
+
+Node Exporter
+
+↓
+
+9100
+
+↓
+
+Firewall
+
+↓
+
+Prometheus Targets
+
+-------------------------------------------------------------------------------
+
+Q48.
+
+Grafana Dashboard Empty
+
+Answer
+
+Datasource
+
+↓
+
+Prometheus
+
+↓
+
+Targets
+
+-------------------------------------------------------------------------------
+
+Q49.
+
+Difference
+
+Prometheus vs Grafana
+
+Answer
+
+Prometheus
+
+Collect
+
+Store
+
+Alert
+
+Grafana
+
+Dashboard
+
+Visualization
+
+-------------------------------------------------------------------------------
+
+Q50.
+
+Explain complete Monitoring Architecture.
+
+Answer
+
+Linux Server
+
+↓
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+TSDB
+
+↓
+
+PromQL
+
+↓
+
+Alert Rule
+
+↓
+
+Alertmanager
+
+↓
+
+SMTP
+
+↓
+
+Linux Team
+
+===============================================================================
+RAPID FIRE QUESTIONS
+===============================================================================
+
+Prometheus Port
+
+9090
+
+--------------------------------
+
+Node Exporter Port
+
+9100
+
+--------------------------------
+
+Grafana Port
+
+3000
+
+--------------------------------
+
+Alertmanager Port
+
+9093
+
+--------------------------------
+
+Prometheus Config
+
+/etc/prometheus/prometheus.yml
+
+--------------------------------
+
+Alertmanager Config
+
+/etc/alertmanager/alertmanager.yml
+
+--------------------------------
+
+Grafana Config
+
+/etc/grafana/grafana.ini
+
+--------------------------------
+
+Validate Prometheus
+
+promtool check config
+
+--------------------------------
+
+Validate Alertmanager
+
+amtool check-config
+
+--------------------------------
+
+Logs
+
+journalctl
+
+--------------------------------
+
+Service
+
+systemctl
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Prometheus
+
+↓
+
+Collect Metrics
+
+↓
+
+Node Exporter
+
+↓
+
+TSDB
+
+↓
+
+PromQL
+
+↓
+
+Alert Rules
+
+↓
+
+Alertmanager
+
+↓
+
+SMTP
+
+↓
+
+Email
+
+↓
+
+Grafana
+
+Remember
+
+Prometheus
+
+=
+
+Monitoring
+
+Grafana
+
+=
+
+Visualization
+
+Alertmanager
+
+=
+
+Notifications
+
+Node Exporter
+
+=
+
+Linux Metrics
+
+===============================================================================
+END OF FILE
+===============================================================================
