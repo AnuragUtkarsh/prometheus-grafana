@@ -1,0 +1,636 @@
+===============================================================================
+                        03 - NODE EXPORTER
+===============================================================================
+
+Author      : Anurag
+Technology  : Prometheus Node Exporter
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+WHAT IS NODE EXPORTER?
+===============================================================================
+
+Node Exporter is an Exporter used by Prometheus to collect Linux System Metrics.
+
+It exposes Linux system metrics through an HTTP endpoint.
+
+Prometheus periodically scrapes these metrics.
+
+Default Port
+
+9100
+
+===============================================================================
+ARCHITECTURE
+===============================================================================
+
+Linux Server
+
+↓
+
+Node Exporter
+
+↓
+
+http://server_ip:9100/metrics
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+===============================================================================
+LAB SETUP
+===============================================================================
+
+Prometheus
+
+192.168.198.171
+
+--------------------------
+
+Node1
+
+192.168.198.172
+
+--------------------------
+
+Node2
+
+192.168.198.173
+
+===============================================================================
+STEP 1 : CREATE USER
+===============================================================================
+
+sudo useradd --no-create-home \
+--shell /usr/sbin/nologin node_exporter
+
+Purpose
+
+Dedicated User
+
+No Login
+
+Security
+
+===============================================================================
+STEP 2 : DOWNLOAD
+===============================================================================
+
+cd /tmp
+
+Download latest Node Exporter binary from GitHub Releases.
+
+Example Version Used
+
+node_exporter-1.11.1.linux-amd64.tar.gz
+
+===============================================================================
+STEP 3 : EXTRACT
+===============================================================================
+
+tar -xzf node_exporter-1.11.1.linux-amd64.tar.gz
+
+cd node_exporter-1.11.1.linux-amd64
+
+===============================================================================
+STEP 4 : VERIFY
+===============================================================================
+
+ls
+
+Expected
+
+node_exporter
+
+LICENSE
+
+NOTICE
+
+===============================================================================
+STEP 5 : COPY BINARY
+===============================================================================
+
+sudo cp node_exporter /usr/local/bin/
+
+Verify
+
+node_exporter --version
+
+===============================================================================
+STEP 6 : CHANGE OWNERSHIP
+===============================================================================
+
+sudo chown node_exporter:node_exporter /usr/local/bin/node_exporter
+
+===============================================================================
+STEP 7 : CREATE SYSTEMD SERVICE
+===============================================================================
+
+File
+
+/etc/systemd/system/node_exporter.service
+
+Contents
+
+[Unit]
+
+Description=Prometheus Node Exporter
+
+Documentation=https://github.com/prometheus/node_exporter
+
+After=network-online.target
+
+[Service]
+
+User=node_exporter
+
+Group=node_exporter
+
+Type=simple
+
+ExecStart=/usr/local/bin/node_exporter
+
+Restart=on-failure
+
+[Install]
+
+WantedBy=multi-user.target
+
+===============================================================================
+STEP 8 : START SERVICE
+===============================================================================
+
+sudo systemctl daemon-reload
+
+sudo systemctl enable node_exporter
+
+sudo systemctl start node_exporter
+
+===============================================================================
+STEP 9 : VERIFY
+===============================================================================
+
+systemctl status node_exporter
+
+ss -lntp | grep 9100
+
+Expected
+
+LISTEN
+
+9100
+
+===============================================================================
+STEP 10 : VERIFY FROM BROWSER
+===============================================================================
+
+http://192.168.198.172:9100/metrics
+
+or
+
+http://192.168.198.173:9100/metrics
+
+Large list of metrics should appear.
+
+===============================================================================
+ADD NODE EXPORTER TO PROMETHEUS
+===============================================================================
+
+Edit
+
+/etc/prometheus/prometheus.yml
+
+Example
+
+scrape_configs:
+
+- job_name: "linux_servers"
+
+  static_configs:
+
+  - targets:
+
+      - "192.168.198.172:9100"
+
+      - "192.168.198.173:9100"
+
+===============================================================================
+VALIDATE CONFIG
+===============================================================================
+
+promtool check config /etc/prometheus/prometheus.yml
+
+Expected
+
+SUCCESS
+
+===============================================================================
+RESTART PROMETHEUS
+===============================================================================
+
+systemctl restart prometheus
+
+===============================================================================
+VERIFY TARGETS
+===============================================================================
+
+Browser
+
+http://192.168.198.171:9090/targets
+
+Expected
+
+State
+
+UP
+
+===============================================================================
+HOW NODE EXPORTER WORKS
+===============================================================================
+
+Reads Data From
+
+/proc
+
+/sys
+
+Kernel
+
+Filesystem
+
+Network Stack
+
+Memory
+
+CPU
+
+Disk
+
+Then exposes metrics on
+
+http://server:9100/metrics
+
+===============================================================================
+IMPORTANT METRICS
+===============================================================================
+
+CPU
+
+node_cpu_seconds_total
+
+--------------------------------
+
+Memory Total
+
+node_memory_MemTotal_bytes
+
+--------------------------------
+
+Memory Available
+
+node_memory_MemAvailable_bytes
+
+--------------------------------
+
+Filesystem Size
+
+node_filesystem_size_bytes
+
+--------------------------------
+
+Filesystem Free
+
+node_filesystem_avail_bytes
+
+--------------------------------
+
+Load
+
+node_load1
+
+node_load5
+
+node_load15
+
+--------------------------------
+
+Network Receive
+
+node_network_receive_bytes_total
+
+--------------------------------
+
+Network Transmit
+
+node_network_transmit_bytes_total
+
+--------------------------------
+
+Running Processes
+
+node_procs_running
+
+--------------------------------
+
+Boot Time
+
+node_boot_time_seconds
+
+--------------------------------
+
+System Time
+
+node_time_seconds
+
+===============================================================================
+COMMON COMMANDS
+===============================================================================
+
+Version
+
+node_exporter --version
+
+--------------------------------
+
+Status
+
+systemctl status node_exporter
+
+--------------------------------
+
+Restart
+
+systemctl restart node_exporter
+
+--------------------------------
+
+Logs
+
+journalctl -u node_exporter -f
+
+--------------------------------
+
+Listening Port
+
+ss -lntp | grep 9100
+
+===============================================================================
+COMMON ERRORS
+===============================================================================
+
+Error
+
+Bad Unit File
+
+Reason
+
+Wrong Systemd Service
+
+--------------------------------
+
+Error
+
+Permission Denied
+
+Reason
+
+Ownership Problem
+
+--------------------------------
+
+Error
+
+Port Already Used
+
+Solution
+
+ss -lntp | grep 9100
+
+--------------------------------
+
+Error
+
+Target DOWN
+
+Reason
+
+Firewall
+
+Wrong IP
+
+Wrong Port
+
+Service Down
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+1
+
+systemctl status node_exporter
+
+↓
+
+2
+
+journalctl -u node_exporter -f
+
+↓
+
+3
+
+curl localhost:9100/metrics
+
+↓
+
+4
+
+Browser
+
+server_ip:9100/metrics
+
+↓
+
+5
+
+Prometheus
+
+Targets
+
+↓
+
+UP
+
+===============================================================================
+PRODUCTION BEST PRACTICES
+===============================================================================
+
+Dedicated User
+
+Run via Systemd
+
+Do Not Run as Root
+
+Use Static IP
+
+Monitor Multiple Servers
+
+Restart Automatically
+
+===============================================================================
+INTERVIEW QUESTIONS
+===============================================================================
+
+Q1
+
+What is Node Exporter?
+
+Linux Metrics Exporter.
+
+--------------------------------
+
+Q2
+
+Default Port?
+
+9100
+
+--------------------------------
+
+Q3
+
+Who reads metrics?
+
+Prometheus
+
+--------------------------------
+
+Q4
+
+Who exposes metrics?
+
+Node Exporter
+
+--------------------------------
+
+Q5
+
+Does Node Exporter store metrics?
+
+No
+
+--------------------------------
+
+Q6
+
+How does Prometheus collect metrics?
+
+HTTP Pull
+
+--------------------------------
+
+Q7
+
+Where are metrics exposed?
+
+/metrics
+
+--------------------------------
+
+Q8
+
+How to verify Node Exporter?
+
+curl localhost:9100/metrics
+
+--------------------------------
+
+Q9
+
+Configuration file?
+
+No separate configuration required for basic setup.
+
+--------------------------------
+
+Q10
+
+Systemd Service?
+
+/etc/systemd/system/node_exporter.service
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Create User
+
+↓
+
+Download Binary
+
+↓
+
+Extract
+
+↓
+
+Copy Binary
+
+↓
+
+Create Service
+
+↓
+
+Enable
+
+↓
+
+Start
+
+↓
+
+9100
+
+↓
+
+Browser
+
+↓
+
+/metrics
+
+↓
+
+Prometheus Target
+
+↓
+
+UP
+
+Remember
+
+Node Exporter
+
+↓
+
+Exposes Linux Metrics
+
+↓
+
+Prometheus Pulls Metrics
+
+↓
+
+Grafana Displays Metrics
+
+===============================================================================
+END OF FILE
+===============================================================================
