@@ -1,0 +1,737 @@
+===============================================================================
+                           06 - ALERTMANAGER
+===============================================================================
+
+Author      : Anurag
+Technology  : Alertmanager
+Level       : Linux Engineer / DevOps
+
+===============================================================================
+WHAT IS ALERTMANAGER?
+===============================================================================
+
+Alertmanager is a notification component of Prometheus.
+
+It receives alerts from Prometheus and sends notifications to different
+receivers.
+
+Examples
+
+- Email
+- Slack
+- Microsoft Teams
+- PagerDuty
+- Webhook
+
+Alertmanager DOES NOT collect metrics.
+
+Alertmanager DOES NOT evaluate rules.
+
+Alertmanager ONLY handles notifications.
+
+===============================================================================
+ARCHITECTURE
+===============================================================================
+
+Linux Server
+
+↓
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+Alert Rule
+
+↓
+
+Alertmanager
+
+↓
+
+Email / Slack / Teams
+
+===============================================================================
+DEFAULT PORT
+===============================================================================
+
+9093
+
+===============================================================================
+LAB SETUP
+===============================================================================
+
+Hostname
+
+prometheus
+
+IP
+
+192.168.198.171
+
+Alertmanager
+
+192.168.198.171:9093
+
+===============================================================================
+INSTALLATION
+===============================================================================
+
+Create User
+
+sudo useradd --no-create-home \
+--shell /usr/sbin/nologin alertmanager
+
+-------------------------------------------------------------------------------
+
+Create Directories
+
+sudo mkdir /etc/alertmanager
+
+sudo mkdir /var/lib/alertmanager
+
+-------------------------------------------------------------------------------
+
+Download Binary
+
+Example Version
+
+alertmanager-0.32.1.linux-amd64.tar.gz
+
+-------------------------------------------------------------------------------
+
+Extract
+
+tar -xzf alertmanager-0.32.1.linux-amd64.tar.gz
+
+-------------------------------------------------------------------------------
+
+Copy Binary
+
+sudo cp alertmanager /usr/local/bin/
+
+sudo cp amtool /usr/local/bin/
+
+-------------------------------------------------------------------------------
+
+Copy Configuration
+
+sudo cp alertmanager.yml /etc/alertmanager/
+
+-------------------------------------------------------------------------------
+
+Ownership
+
+sudo chown -R alertmanager:alertmanager /etc/alertmanager
+
+sudo chown -R alertmanager:alertmanager /var/lib/alertmanager
+
+sudo chown alertmanager:alertmanager /usr/local/bin/alertmanager
+
+sudo chown alertmanager:alertmanager /usr/local/bin/amtool
+
+===============================================================================
+SYSTEMD SERVICE
+===============================================================================
+
+File
+
+/etc/systemd/system/alertmanager.service
+
+ExecStart
+
+/usr/local/bin/alertmanager
+
+--config.file=/etc/alertmanager/alertmanager.yml
+
+--storage.path=/var/lib/alertmanager
+
+===============================================================================
+SYSTEMD COMMANDS
+===============================================================================
+
+Enable
+
+systemctl enable alertmanager
+
+--------------------------------
+
+Start
+
+systemctl start alertmanager
+
+--------------------------------
+
+Restart
+
+systemctl restart alertmanager
+
+--------------------------------
+
+Status
+
+systemctl status alertmanager
+
+--------------------------------
+
+Logs
+
+journalctl -u alertmanager -f
+
+===============================================================================
+VERIFY
+===============================================================================
+
+Browser
+
+http://192.168.198.171:9093
+
+Expected
+
+Alertmanager UI Opens
+
+===============================================================================
+PROMETHEUS INTEGRATION
+===============================================================================
+
+Edit
+
+/etc/prometheus/prometheus.yml
+
+Add
+
+alerting:
+
+  alertmanagers:
+
+    - static_configs:
+
+        - targets:
+
+            - "localhost:9093"
+
+-------------------------------------------------------------------------------
+
+Validate
+
+promtool check config /etc/prometheus/prometheus.yml
+
+-------------------------------------------------------------------------------
+
+Restart
+
+systemctl restart prometheus
+
+===============================================================================
+SMTP CONFIGURATION
+===============================================================================
+
+File
+
+/etc/alertmanager/alertmanager.yml
+
+Example
+
+global:
+
+  smtp_smarthost: 'smtp.gmail.com:587'
+
+  smtp_from: 'yourmail@gmail.com'
+
+  smtp_auth_username: 'yourmail@gmail.com'
+
+  smtp_auth_password: 'APP_PASSWORD'
+
+  smtp_require_tls: true
+
+route:
+
+  receiver: email-alert
+
+receivers:
+
+- name: email-alert
+
+  email_configs:
+
+  - to: 'receiver@gmail.com'
+
+    send_resolved: true
+
+===============================================================================
+GMAIL APP PASSWORD
+===============================================================================
+
+Normal Gmail Password will NOT work.
+
+Requirements
+
+Google Account
+
+↓
+
+2 Step Verification
+
+↓
+
+App Password
+
+↓
+
+Use App Password in
+
+smtp_auth_password
+
+===============================================================================
+ALERT FLOW
+===============================================================================
+
+Node Exporter
+
+↓
+
+Prometheus
+
+↓
+
+Alert Rule
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+SMTP Server
+
+↓
+
+Email
+
+===============================================================================
+RECEIVER
+===============================================================================
+
+Receiver means
+
+Where alert should go.
+
+Examples
+
+email-alert
+
+slack-alert
+
+teams-alert
+
+pagerduty-alert
+
+===============================================================================
+ROUTE
+===============================================================================
+
+Route decides
+
+Which Receiver should receive alert.
+
+Example
+
+route:
+
+  receiver: email-alert
+
+===============================================================================
+SEND_RESOLVED
+===============================================================================
+
+send_resolved: true
+
+Meaning
+
+When alert is resolved
+
+↓
+
+Another Email will be sent.
+
+===============================================================================
+GROUPING
+===============================================================================
+
+Multiple alerts
+
+↓
+
+Group together
+
+↓
+
+Single Notification
+
+Instead of
+
+100 Emails
+
+===============================================================================
+SILENCE
+===============================================================================
+
+Temporarily suppress alerts.
+
+Example
+
+Maintenance Window
+
+===============================================================================
+INHIBITION
+===============================================================================
+
+Suppress child alerts
+
+if
+
+Parent Alert already firing.
+
+Example
+
+Server Down
+
+↓
+
+CPU Alert
+
+Disk Alert
+
+Memory Alert
+
+No need to send all.
+
+===============================================================================
+AMTOOL
+===============================================================================
+
+Configuration Validation
+
+amtool check-config /etc/alertmanager/alertmanager.yml
+
+Expected
+
+SUCCESS
+
+===============================================================================
+COMMON COMMANDS
+===============================================================================
+
+Version
+
+alertmanager --version
+
+--------------------------------
+
+Check Config
+
+amtool check-config
+
+--------------------------------
+
+Logs
+
+journalctl -u alertmanager -f
+
+--------------------------------
+
+Listening Port
+
+ss -lntp | grep 9093
+
+===============================================================================
+COMMON ERRORS
+===============================================================================
+
+Error
+
+SMTP Authentication Failed
+
+Reason
+
+Wrong Password
+
+Use App Password
+
+--------------------------------
+
+Error
+
+DNS Lookup Failed
+
+lookup smtp.gmail.com
+
+Reason
+
+DNS Not Configured
+
+--------------------------------
+
+Error
+
+Connection Refused
+
+SMTP Port Blocked
+
+--------------------------------
+
+Error
+
+Alert Not Received
+
+Prometheus Not Connected
+
+-------------------------------------------------------------------------------
+
+Error
+
+Receiver Not Found
+
+Wrong Receiver Name
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+Alert Not Coming
+
+↓
+
+Prometheus Rule FIRING?
+
+↓
+
+Alertmanager Running?
+
+↓
+
+Prometheus Connected?
+
+↓
+
+SMTP Working?
+
+↓
+
+DNS Working?
+
+↓
+
+Firewall?
+
+===============================================================================
+PRODUCTION FLOW
+===============================================================================
+
+CPU > 80%
+
+↓
+
+Prometheus Rule
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+SMTP
+
+↓
+
+Linux Team
+
+===============================================================================
+INTERVIEW QUESTIONS
+===============================================================================
+
+Q1
+
+What is Alertmanager?
+
+Notification Component.
+
+------------------------------------------------
+
+Q2
+
+Does Alertmanager collect metrics?
+
+No
+
+------------------------------------------------
+
+Q3
+
+Does Alertmanager evaluate rules?
+
+No
+
+Prometheus evaluates rules.
+
+------------------------------------------------
+
+Q4
+
+Default Port?
+
+9093
+
+------------------------------------------------
+
+Q5
+
+Who sends Email?
+
+Alertmanager
+
+------------------------------------------------
+
+Q6
+
+Difference between Prometheus and Alertmanager?
+
+Prometheus
+
+Collects Metrics
+
+Stores Metrics
+
+Evaluates Rules
+
+Alertmanager
+
+Receives Alerts
+
+Groups Alerts
+
+Routes Alerts
+
+Sends Notifications
+
+------------------------------------------------
+
+Q7
+
+What is Receiver?
+
+Destination of Alerts.
+
+------------------------------------------------
+
+Q8
+
+What is Route?
+
+Decides receiver.
+
+------------------------------------------------
+
+Q9
+
+What is send_resolved?
+
+Send notification after alert resolved.
+
+------------------------------------------------
+
+Q10
+
+What is Silence?
+
+Temporarily suppress alerts.
+
+------------------------------------------------
+
+Q11
+
+What is Inhibition?
+
+Suppress related alerts when parent alert exists.
+
+===============================================================================
+5 MINUTE REVISION
+===============================================================================
+
+Prometheus
+
+↓
+
+Alert Rule
+
+↓
+
+Pending
+
+↓
+
+Firing
+
+↓
+
+Alertmanager
+
+↓
+
+Receiver
+
+↓
+
+SMTP
+
+↓
+
+Email
+
+Ports
+
+9093
+
+Remember
+
+Alertmanager
+
+=
+
+Notification Engine
+
+Prometheus
+
+=
+
+Monitoring Engine
+
+amtool
+
+=
+
+Config Validation
+
+===============================================================================
+END OF FILE
+===============================================================================
